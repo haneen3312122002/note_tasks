@@ -10,10 +10,8 @@ class NoteDataSource {
       content: note.content,
       date: note.date,
     );
-    final newId = await AppDatabase.insertNote(
-      model.toMap(),
-    ); // ✅ يحفظ id الجديد
-    return newId; // ✅ نرجعه للأعلى
+    final newId = await AppDatabase.insertNote(model.toMap());
+    return newId;
   }
 
   Future<List<NoteModel>> getAllNotes() async {

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notes_tasks/note/domain/entities/note_entity.dart';
 import 'package:notes_tasks/note/domain/usecases/get_note_byid_usecase.dart';
-import 'package:notes_tasks/note/presentation/providers/get_note_byid_provider.dart';
+import 'package:notes_tasks/note/presentation/providers/add_note_provider.dart';
 
 final noteByIdViewModelProvider =
     AsyncNotifierProvider<GetNoteByIdViewModel, NoteEntity?>(

@@ -4,6 +4,7 @@ import 'package:notes_tasks/note/data/repositories/note_repimpl.dart';
 import 'package:notes_tasks/note/domain/repositories/note_rep.dart';
 import 'package:notes_tasks/note/domain/usecases/add_note_usecase.dart';
 import 'package:notes_tasks/note/domain/usecases/get_all_notes_usecase.dart';
+import 'package:notes_tasks/note/domain/usecases/get_note_byid_usecase.dart';
 
 final noteDataSourceProvider = Provider<NoteDataSource>((ref) {
   return NoteDataSource();
@@ -19,3 +20,12 @@ final addNotesUseCaseProvider = Provider<AddNoteUseCase>((ref) {
   return AddNoteUseCase(rep: rep);
 });
 //..................
+final getAllNotesUseCaseProvider = Provider<GetAllNotesUseCase>((ref) {
+  final rep = ref.watch(noteRepositoryProvider);
+  return GetAllNotesUseCase(rep: rep);
+});
+//.............
+final getNoteByIdUseCaseProvider = Provider<GetNoteByIdUseCase>((ref) {
+  final rep = ref.watch(noteRepositoryProvider);
+  return GetNoteByIdUseCase(rep: rep);
+});

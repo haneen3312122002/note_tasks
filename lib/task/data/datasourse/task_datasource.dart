@@ -38,6 +38,7 @@ class TaskDataSource {
   }
 
   Future<int> deleteTask(int id) async {
-    return await AppDatabase.deleteTask(id);
+    final taskId = await AppDatabase.deleteTask(id);
+    return taskId;
   }
 }
