@@ -29,3 +29,4 @@ final getNoteByIdUseCaseProvider = Provider<GetNoteByIdUseCase>((ref) {
   final rep = ref.watch(noteRepositoryProvider);
   return GetNoteByIdUseCase(rep: rep);
 });
+//...............................

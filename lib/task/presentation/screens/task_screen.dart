@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notes_tasks/task/presentation/providers/task_providers.dart';
 import 'package:notes_tasks/task/presentation/screens/add_task_screen.dart';
 import 'package:notes_tasks/task/presentation/screens/get_task_byid.dart';
+import 'package:notes_tasks/task/presentation/viewmodels/delete_task_viewmodel.dart';
 import 'package:notes_tasks/task/presentation/viewmodels/get_all_tasks_viewmodel.dart';
 import 'package:notes_tasks/task/domain/entities/task_entity.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +15,9 @@ class TaskScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tasksState = ref.watch(getAllTasksViewModelProvider);
     final notifier = ref.read(getAllTasksViewModelProvider.notifier);
+
+    final deleteNotifier = ref.read(deleteTaskViewModelProvider.notifier);
+    final deleteState = ref.watch(deleteTaskViewModelProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Tasks')),
@@ -62,14 +67,41 @@ class TaskScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        trailing: Text(
-                          task.status.toUpperCase(),
-                          style: TextStyle(
-                            color: isDone
-                                ? Colors.green[800]
-                                : Colors.orange[800],
-                            fontWeight: FontWeight.bold,
-                          ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              task.status.toUpperCase(),
+                              style: TextStyle(
+                                color: isDone
+                                    ? Colors.green[800]
+                                    : Colors.orange[800],
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                if (task.id != null) {
+                                  await deleteNotifier.deleteTask(task.id!);
+                                  await notifier.refreshTasks();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Deleted: "${task.title}" successfully',
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Task has no ID yet.'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
                         ),
                         onTap: () {
                           if (task.id != null) {
