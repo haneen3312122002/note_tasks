@@ -1,12 +1,11 @@
 import 'package:notes_tasks/note/data/datasourse/note_datasourse.dart';
+import 'package:notes_tasks/note/domain/entities/note_entity.dart';
 import 'package:notes_tasks/note/domain/repositories/note_rep.dart';
 
-import '../../domain/entities/note_entity.dart';
-
-class NoteRepositoryImpl implements NoteRep {
+class NoteRepImpl implements NoteRep {
   final NoteDataSource ds;
 
-  NoteRepositoryImpl({required this.ds});
+  NoteRepImpl({required this.ds});
 
   @override
   Future<int> insertNote(NoteEntity note) async {
@@ -14,8 +13,14 @@ class NoteRepositoryImpl implements NoteRep {
   }
 
   @override
+  @override
   Future<List<NoteEntity>> getAllNotes() async {
     final models = await ds.getAllNotes();
+
+    for (var m in models) {
+      print('Fetched note => id: ${m.id}, title: ${m.title}');
+    }
+
     return models
         .map(
           (m) => NoteEntity(
@@ -30,20 +35,14 @@ class NoteRepositoryImpl implements NoteRep {
 
   @override
   Future<NoteEntity?> getNoteById(int id) async {
-    final map = await AppDatabase.getNoteById(id);
-
-    if (map != null) {
-      // تحويل من Map → Model → Entity
-      final model = NoteModel.fromMap(map);
-      return NoteEntity(
-        id: model.id,
-        title: model.title,
-        content: model.content,
-        date: model.date,
-      );
-    } else {
-      return null; // لم يتم العثور على الصف
-    }
+    final model = await ds.getNoteById(id);
+    if (model == null) return null;
+    return NoteEntity(
+      id: model.id,
+      title: model.title,
+      content: model.content,
+      date: model.date,
+    );
   }
 
   @override
