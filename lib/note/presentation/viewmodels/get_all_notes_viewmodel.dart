@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'package:notes_tasks/note/presentation/providers/add_note_provider.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notes_tasks/note/domain/entities/note_entity.dart';
 import 'package:notes_tasks/note/domain/usecases/get_all_notes_usecase.dart';
-import 'package:notes_tasks/note/presentation/providers/add_note_provider';
 
 final noteViewModelProvider =
     AsyncNotifierProvider<GetAllNotesViewModelNotifier, List<NoteEntity>>(

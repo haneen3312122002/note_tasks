@@ -1,4 +1,5 @@
-import '../datasource/task_datasource.dart';
+import 'package:notes_tasks/task/data/datasourse/task_datasource.dart';
+
 import '../../domain/entities/task_entity.dart';
 import '../../domain/repositories/task_rep.dart';
 
@@ -16,13 +17,15 @@ class TaskRepImpl implements TaskRep {
   Future<List<TaskEntity>> getAllTasks() async {
     final models = await ds.getAllTasks();
     return models
-        .map((m) => TaskEntity(
-              id: m.id,
-              title: m.title,
-              description: m.description,
-              date: m.date,
-              status: m.status,
-            ))
+        .map(
+          (m) => TaskEntity(
+            id: m.id,
+            title: m.title,
+            description: m.description,
+            date: m.date,
+            status: m.status,
+          ),
+        )
         .toList();
   }
 

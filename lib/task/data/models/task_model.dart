@@ -1,11 +1,10 @@
-
 import 'package:notes_tasks/task/domain/entities/task_entity.dart';
 
 class TaskModel extends TaskEntity {
   final int? id;
   final String title;
   final String description;
-  final String date;
+  final DateTime date;
   final String status;
 
   TaskModel({
@@ -14,14 +13,20 @@ class TaskModel extends TaskEntity {
     required this.description,
     required this.date,
     required this.status,
-  }) : super(id: 0, title: '', description: '', date: '', status: '');
+  }) : super(
+         id: 0,
+         title: '',
+         description: '',
+         date: DateTime.now(),
+         status: '',
+       );
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,
       'description': description,
-      'date': date,
+      'date': date.toIso8601String(),
       'status': status,
     };
   }
@@ -29,10 +34,12 @@ class TaskModel extends TaskEntity {
   factory TaskModel.fromMap(Map<String, dynamic> map) {
     return TaskModel(
       id: map['id'],
-      title: map['title'] ?? '',
-      description: map['description'] ?? '',
-      date: map['date'] ?? '',
-      status: map['status'] ?? '',
+      title: map['title'],
+      description: map['description'],
+      date:
+          DateTime.tryParse(map['date'].toString()) ??
+          DateTime.now(), // ✅ تحويل من String إلى DateTime
+      status: map['status'],
     );
   }
 
@@ -40,7 +47,7 @@ class TaskModel extends TaskEntity {
     int? id,
     String? title,
     String? description,
-    String? date,
+    DateTime? date,
     String? status,
   }) {
     return TaskModel(
