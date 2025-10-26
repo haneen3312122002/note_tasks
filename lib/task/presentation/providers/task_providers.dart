@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:notes_tasks/task/data/datasourse/task_datasource.dart';
 import 'package:notes_tasks/task/data/repositories/task_rep_impl.dart';
 import 'package:notes_tasks/task/domain/repositories/task_rep.dart';
@@ -34,3 +35,5 @@ final deleteTaskUseCaseProvider = Provider<DeleteTaskUseCase>((ref) {
   final rep = ref.watch(taskRepositoryProvider);
   return DeleteTaskUseCase(rep: rep);
 });
+//..........
+final CardExpandedProvider = StateProvider<Map<int, bool>>((ref) => {});

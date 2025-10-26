@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:notes_tasks/task/presentation/providers/task_providers.dart';
+import 'package:notes_tasks/task/domain/entities/task_entity.dart';
+import 'package:notes_tasks/task/presentation/widgets/task_card.dart';
 import 'package:notes_tasks/task/presentation/screens/add_task_screen.dart';
-import 'package:notes_tasks/task/presentation/screens/get_task_byid.dart';
+import 'package:notes_tasks/task/presentation/screens/update_task_screen.dart';
 import 'package:notes_tasks/task/presentation/viewmodels/delete_task_viewmodel.dart';
 import 'package:notes_tasks/task/presentation/viewmodels/get_all_tasks_viewmodel.dart';
-import 'package:notes_tasks/task/domain/entities/task_entity.dart';
-import 'package:intl/intl.dart';
+import 'package:notes_tasks/core/widgets/app_snackbar.dart';
+import 'package:notes_tasks/task/presentation/providers/task_providers.dart';
 
 class TaskScreen extends ConsumerWidget {
   const TaskScreen({super.key});
@@ -14,118 +15,62 @@ class TaskScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tasksState = ref.watch(getAllTasksViewModelProvider);
-    final notifier = ref.read(getAllTasksViewModelProvider.notifier);
-
+    final taskNotifier = ref.read(getAllTasksViewModelProvider.notifier);
     final deleteNotifier = ref.read(deleteTaskViewModelProvider.notifier);
-    final deleteState = ref.watch(deleteTaskViewModelProvider);
+    final expandState = ref.watch(CardExpandedProvider);
+    final expandNotifier = ref.read(CardExpandedProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Tasks')),
       body: tasksState.when(
         data: (tasks) => RefreshIndicator(
-          onRefresh: () async => await notifier.refreshTasks(),
+          onRefresh: () async => await taskNotifier.refreshTasks(),
           child: tasks.isEmpty
               ? const Center(child: Text('No tasks yet.'))
               : ListView.builder(
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
-                    final TaskEntity task = tasks[index];
-                    final isDone = task.status == 'done';
-                    final formattedDate = DateFormat(
-                      'yyyy-MM-dd – HH:mm',
-                    ).format(task.date);
-                    final cardColor = isDone
-                        ? Colors.green[100]
-                        : Colors.orange[100];
+                    final task = tasks[index];
+                    final isExpanded = expandState[task.id] ?? false;
 
-                    return Card(
-                      color: cardColor,
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 6,
-                        horizontal: 12,
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          task.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (task.description.isNotEmpty)
-                              Text(task.description),
-                            const SizedBox(height: 4),
-                            Text(
-                              '📅 $formattedDate',
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 12,
-                              ),
+                    return TaskCard(
+                      task: task,
+                      isExpanded: isExpanded,
+                      onTap: () {
+                        if (task.id != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  UpdateTaskScreen(taskId: task.id!),
                             ),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              task.status.toUpperCase(),
-                              style: TextStyle(
-                                color: isDone
-                                    ? Colors.green[800]
-                                    : Colors.orange[800],
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () async {
-                                if (task.id != null) {
-                                  await deleteNotifier.deleteTask(task.id!);
-                                  await notifier.refreshTasks();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Deleted: "${task.title}" successfully',
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Task has no ID yet.'),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-                          if (task.id != null) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    UpdateTaskScreen(taskId: task.id!),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Task has no ID yet.'),
-                              ),
-                            );
-                          }
-                        },
-                      ),
+                          );
+                        } else {
+                          AppSnackbar.show(context, 'Task has no ID yet.');
+                        }
+                      },
+                      onDelete: () async {
+                        if (task.id != null) {
+                          await deleteNotifier.deleteTask(task.id!);
+                          await taskNotifier.refreshTasks();
+                          AppSnackbar.show(
+                            context,
+                            'Deleted: "${task.title}" successfully',
+                          );
+                        }
+                      },
+                      onExpand: () {
+                        expandNotifier.state = {
+                          ...expandNotifier.state,
+                          task.id!: !isExpanded,
+                        };
+                      },
                     );
                   },
                 ),
         ),
-        error: (e, _) => Center(child: Text('Error: $e')),
         loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -133,7 +78,7 @@ class TaskScreen extends ConsumerWidget {
             context,
             MaterialPageRoute(builder: (_) => const AddTaskScreen()),
           );
-          await notifier.refreshTasks();
+          await taskNotifier.refreshTasks();
         },
         child: const Icon(Icons.add),
       ),
