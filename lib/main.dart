@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:notes_tasks/note/presentation/views/notes_list_screen.dart';
-import 'package:notes_tasks/task/presentation/screens/task_screen.dart';
+import 'package:notes_tasks/users/presentation/screens/users_screnn.dart';
 
 void main() {
   runApp(ProviderScope(child: MyApp()));
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: TaskScreen(),
+      home: UserScreen(),
     );
   }
 }

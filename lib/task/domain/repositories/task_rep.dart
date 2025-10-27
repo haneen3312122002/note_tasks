@@ -1,9 +1,6 @@
-import '../../domain/entities/task_entity.dart';
+// lib/task/domain/repositories/task_repository.dart
+import 'package:notes_tasks/task/domain/entities/task_entity.dart';
 
-abstract class TaskRep {
-  Future<int> insertTask(TaskEntity task);
+abstract class TaskRepo {
   Future<List<TaskEntity>> getAllTasks();
-  Future<TaskEntity?> getTaskById(int id);
-  Future<int> updateTask(TaskEntity task);
-  Future<int> deleteTask(int id);
 }

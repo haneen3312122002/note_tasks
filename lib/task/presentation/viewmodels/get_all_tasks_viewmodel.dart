@@ -1,3 +1,4 @@
+// lib/task/presentation/viewmodels/get_all_tasks_viewmodel.dart
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notes_tasks/task/domain/entities/task_entity.dart';
@@ -10,16 +11,23 @@ final getAllTasksViewModelProvider =
     );
 
 class GetAllTasksViewModel extends AsyncNotifier<List<TaskEntity>> {
-  late final GetAllTasksUseCase _getAllTasksUseCase;
+  late final GetAllTasksUseCase _getAllTasksUseCase = ref.read(
+    getAllTasksUseCaseProvider,
+  );
 
   @override
   FutureOr<List<TaskEntity>> build() async {
+    return _loadTasks();
+  }
+
+  Future<List<TaskEntity>> _loadTasks() async {
     try {
-      _getAllTasksUseCase = ref.watch(getAllTasksUseCaseProvider);
       final tasks = await _getAllTasksUseCase.call();
-      return tasks; // ✅ لا تغيّر state داخل build
+      return tasks;
     } catch (e, st) {
-      print('❌ Error in GetAllTasksViewModel.build: $e');
+      print(' Error in GetAllTasksViewModel.build: $e');
+      // يرجع AsyncError ليتعامل معه واجهة المستخدم
+      state = AsyncError(e, st);
       return [];
     }
   }

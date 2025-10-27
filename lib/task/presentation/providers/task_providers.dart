@@ -1,39 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:notes_tasks/task/data/datasourse/task_datasource.dart';
+import 'package:notes_tasks/core/task_api_service.dart';
+import 'package:notes_tasks/task/data/datasourse/task_datasourse.dart';
 import 'package:notes_tasks/task/data/repositories/task_rep_impl.dart';
 import 'package:notes_tasks/task/domain/repositories/task_rep.dart';
-import 'package:notes_tasks/task/domain/usecases/add_task_usecase.dart';
-import 'package:notes_tasks/task/domain/usecases/delete_task_usecase.dart';
 import 'package:notes_tasks/task/domain/usecases/get_all_tasks_usecase.dart';
-import 'package:notes_tasks/task/domain/usecases/get_task_byid_usecase.dart';
 
-final taskDataSourceProvider = Provider<TaskDataSource>((ref) {
-  return TaskDataSource();
+final apiServiceProvider = Provider<TaskApiService>((ref) {
+  return TaskApiService();
 });
 
-final taskRepositoryProvider = Provider<TaskRep>((ref) {
-  final ds = ref.watch(taskDataSourceProvider);
+final taskDataSourceProvider = Provider<TaskDataSource>((ref) {
+  final api = ref.read(apiServiceProvider);
+  return TaskDataSource(api);
+});
+
+final taskRepoProvider = Provider<TaskRepo>((ref) {
+  final ds = ref.read(taskDataSourceProvider);
   return TaskRepImpl(ds: ds);
 });
 
-final addTaskUseCaseProvider = Provider<AddTaskUseCase>((ref) {
-  final rep = ref.watch(taskRepositoryProvider);
-  return AddTaskUseCase(rep: rep);
-});
-
 final getAllTasksUseCaseProvider = Provider<GetAllTasksUseCase>((ref) {
-  final rep = ref.watch(taskRepositoryProvider);
-  return GetAllTasksUseCase(rep: rep);
+  final repo = ref.read(taskRepoProvider);
+  return GetAllTasksUseCase(rep: repo);
 });
-
-final getTaskByIdUseCaseProvider = Provider<GetTaskByIdUseCase>((ref) {
-  final rep = ref.watch(taskRepositoryProvider);
-  return GetTaskByIdUseCase(rep: rep);
-});
-final deleteTaskUseCaseProvider = Provider<DeleteTaskUseCase>((ref) {
-  final rep = ref.watch(taskRepositoryProvider);
-  return DeleteTaskUseCase(rep: rep);
-});
-//..........
-final CardExpandedProvider = StateProvider<Map<int, bool>>((ref) => {});

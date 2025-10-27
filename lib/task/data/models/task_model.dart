@@ -1,66 +1,39 @@
 import 'package:notes_tasks/task/domain/entities/task_entity.dart';
 
 class TaskModel extends TaskEntity {
-  final int? id;
-  final String title;
-  final String description;
-  final DateTime date;
-  final String status;
+  const TaskModel({
+    required super.id,
+    required super.todo,
+    required super.completed,
+    required super.userId,
+  });
 
-  TaskModel({
-    this.id,
-    required this.title,
-    required this.description,
-    required this.date,
-    required this.status,
-  }) : super(
-         id: 0,
-         title: '',
-         description: '',
-         date: DateTime.now(),
-         status: '',
-       );
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'date': date.toIso8601String(),
-      'status': status,
-    };
-  }
-
+  /// json ---> model
   factory TaskModel.fromMap(Map<String, dynamic> map) {
     return TaskModel(
-      id: map['id'],
-      title: map['title'],
-      description: map['description'],
-      date:
-          DateTime.tryParse(map['date'].toString()) ??
-          DateTime.now(), // ✅ تحويل من String إلى DateTime
-      status: map['status'],
+      id: map['id'] ?? 0,
+      todo: map['todo'] ?? '',
+      completed: map['completed'] ?? false,
+      userId: map['userId'] ?? 0,
     );
   }
 
-  TaskModel copyWith({
-    int? id,
-    String? title,
-    String? description,
-    DateTime? date,
-    String? status,
-  }) {
+  /// model ---> json
+  Map<String, dynamic> toMap() {
+    return {'id': id, 'todo': todo, 'completed': completed, 'userId': userId};
+  }
+
+  TaskModel copyWith({int? id, String? todo, bool? completed, int? userId}) {
     return TaskModel(
       id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      date: date ?? this.date,
-      status: status ?? this.status,
+      todo: todo ?? this.todo,
+      completed: completed ?? this.completed,
+      userId: userId ?? this.userId,
     );
   }
 
   @override
   String toString() {
-    return 'TaskModel(id: $id, title: $title, description: $description, date: $date, status: $status)';
+    return 'TaskModel(id: $id, todo: $todo, completed: $completed, userId: $userId)';
   }
 }

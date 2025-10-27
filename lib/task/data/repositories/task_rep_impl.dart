@@ -1,54 +1,15 @@
-import 'package:notes_tasks/task/data/datasourse/task_datasource.dart';
+// lib/task/data/repositories/task_rep_impl.dart
+import 'package:notes_tasks/task/data/datasourse/task_datasourse.dart';
+import 'package:notes_tasks/task/domain/entities/task_entity.dart';
+import 'package:notes_tasks/task/domain/repositories/task_rep.dart';
 
-import '../../domain/entities/task_entity.dart';
-import '../../domain/repositories/task_rep.dart';
-
-class TaskRepImpl implements TaskRep {
+class TaskRepImpl implements TaskRepo {
   final TaskDataSource ds;
 
   TaskRepImpl({required this.ds});
 
   @override
-  Future<int> insertTask(TaskEntity task) async {
-    return await ds.insertTask(task);
-  }
-
-  @override
   Future<List<TaskEntity>> getAllTasks() async {
-    final models = await ds.getAllTasks();
-    return models
-        .map(
-          (m) => TaskEntity(
-            id: m.id,
-            title: m.title,
-            description: m.description,
-            date: m.date,
-            status: m.status,
-          ),
-        )
-        .toList();
-  }
-
-  @override
-  Future<TaskEntity?> getTaskById(int id) async {
-    final model = await ds.getTaskById(id);
-    if (model == null) return null;
-    return TaskEntity(
-      id: model.id,
-      title: model.title,
-      description: model.description,
-      date: model.date,
-      status: model.status,
-    );
-  }
-
-  @override
-  Future<int> updateTask(TaskEntity task) async {
-    return await ds.updateTask(task);
-  }
-
-  @override
-  Future<int> deleteTask(int id) async {
-    return await ds.deleteTask(id);
+    return await ds.getAllTasks();
   }
 }
